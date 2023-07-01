@@ -29,6 +29,7 @@ from metrics import metric_main
 #----------------------------------------------------------------------------
 
 def setup_snapshot_image_grid(training_set, random_seed=0):
+
     rnd = np.random.RandomState(random_seed)
     gw = np.clip(7680 // training_set.image_shape[2], 7, 32)
     gh = np.clip(4320 // training_set.image_shape[1], 4, 32)
@@ -40,13 +41,16 @@ def setup_snapshot_image_grid(training_set, random_seed=0):
         grid_indices = [all_indices[i % len(all_indices)] for i in range(gw * gh)]
 
     else:
-        # Group training samples by label.
         label_groups = dict() # label => [idx, ...]
         for idx in range(len(training_set)):
-            label = tuple(training_set.get_details(idx).raw_label.flat[::-1])
-            if label not in label_groups:
-                label_groups[label] = []
-            label_groups[label].append(idx)
+            details = training_set.get_details(idx)
+            if details.raw_label is not None:
+                label = tuple(details.raw_label.flat[::-1])
+                if label not in label_groups:
+                    label_groups[label] = []
+                label_groups[label].append(idx)
+            else:
+                print(f"No label data for index {idx}")
 
         # Reorder.
         label_order = sorted(label_groups.keys())
