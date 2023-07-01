@@ -34,8 +34,9 @@ def setup_snapshot_image_grid(training_set, random_seed=0):
     gw = np.clip(7680 // training_set.image_shape[2], 7, 32)
     gh = np.clip(4320 // training_set.image_shape[1], 4, 32)
 
+    
     # No labels => show random subset of training samples.
-    if not training_set.has_labels:
+    if not training_set.has_labels or True:
         all_indices = list(range(len(training_set)))
         rnd.shuffle(all_indices)
         grid_indices = [all_indices[i % len(all_indices)] for i in range(gw * gh)]
@@ -223,8 +224,8 @@ def training_loop(
         print('Exporting sample images...')
         grid_size, images, labels = setup_snapshot_image_grid(training_set=training_set)
         save_image_grid(images, os.path.join(run_dir, 'reals.png'), drange=[0,255], grid_size=grid_size)
-        grid_z = torch.randn([16*8, G.z_dim], device=device).split(batch_gpu)
-        grid_c = torch.from_numpy(np.reshape([0] * 16*8 * 4, (16*8, 4))).to(device).split(batch_gpu)
+        grid_z = torch.randn([labels.shape[0], G.z_dim], device=device).split(batch_gpu)
+        grid_c = torch.from_numpy(labels).to(device).split(batch_gpu)
         images = torch.cat([G_ema(z=z, c=c, noise_mode='const').cpu() for z, c in zip(grid_z, grid_c)]).numpy()
         save_image_grid(images, os.path.join(run_dir, 'fakes_init.png'), drange=[-1,1], grid_size=grid_size)
 
