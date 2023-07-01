@@ -65,9 +65,9 @@ def is_image_ext(fname: Union[str, Path]) -> bool:
     return f'.{ext}' in PIL.Image.EXTENSION # type: ignore
 
 #----------------------------------------------------------------------------
-
+import glob
 def open_image_folder(source, *, max_images: Optional[int] = None):
-    input_images = [str(f) for f in sorted(os.listdir(source)) if f.endswith('.jpg')]
+    input_images = [str(f) for f in sorted(glob.glob(source + "*"))]
     # Load labels.
     labels = {}
     if 'dataset.json' in os.listdir(source):
