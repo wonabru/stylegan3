@@ -36,7 +36,7 @@ def setup_snapshot_image_grid(training_set, random_seed=0):
 
     
     # No labels => show random subset of training samples.
-    if not training_set.has_labels and False:
+    if True:
         all_indices = list(range(len(training_set)))
         rnd.shuffle(all_indices)
         grid_indices = [all_indices[i % len(all_indices)] for i in range(gw * gh)]
