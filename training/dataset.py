@@ -150,9 +150,9 @@ class Dataset(torch.utils.data.Dataset):
             if raw_labels.dtype == np.int64:
                 self._label_shape = [int(np.max(raw_labels)) + 1]
             else:
-                self._label_shape = raw_labels.shape[0:]
-        elif len(self._label_shape) != 1:
-            self._label_shape = np.array([0])
+                self._label_shape = [raw_labels.shape[0]]
+        elif isinstance(self._label_shape, int):
+            self._label_shape = np.array([self._label_shape])
         return list(self._label_shape)
 
     @property
