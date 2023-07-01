@@ -61,7 +61,10 @@ class Dataset(torch.utils.data.Dataset):
             if self._raw_labels.dtype == np.int64:
                 assert self._raw_labels.ndim == 1
                 assert np.all(self._raw_labels >= 0)
-        return self._raw_labels
+        if self._raw_labels.shape[1] > 0:  # Check if the second dimension is not empty
+            return self._raw_labels
+        else:
+            return np.array([0])
 
     def close(self): # to be overridden by subclass
         pass
