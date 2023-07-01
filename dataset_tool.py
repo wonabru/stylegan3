@@ -82,7 +82,7 @@ def open_image_zip(source, *, max_images: Optional[int] = None):
         for idx, fname in enumerate(input_images):
             with open(os.path.join(source, fname), 'r') as file:
                 img = PIL.Image.open(file) # type: ignore
-                img = np.array(img)
+                img = np.array(img, dtype=np.float32)
             yield dict(img=img, label=labels.get(fname))
             if idx >= max_idx-1:
                 break
