@@ -117,6 +117,11 @@ class FullyConnectedLayer(torch.nn.Module):
             if self.bias_gain != 1:
                 b = b * self.bias_gain
 
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # Ensure the tensors are on the correct device
+        x = x.to(device)
+        w = w.to(device)
+        b = b.to(device)
         if self.activation == 'linear' and b is not None:
             x = torch.addmm(b.unsqueeze(0), x, w.t())
         else:
@@ -230,6 +235,8 @@ class MappingNetwork(torch.nn.Module):
 
     def forward(self, z, c, truncation_psi=1, truncation_cutoff=None, update_emas=False):
         # Embed, normalize, and concat inputs.
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
         x = None
         with torch.autograd.profiler.record_function('input'):
             if self.z_dim > 0:
@@ -239,7 +246,7 @@ class MappingNetwork(torch.nn.Module):
             #     misc.assert_shape(c, [None, self.c_dim])
             #     y = normalize_2nd_moment(self.embed(c.to(torch.float32)))
             #     x = torch.cat([x, y], dim=1) if x is not None else y
-            x = torch.cat([x, torch.zeros_like(x).to(torch.float32)], dim=1) if x is not None else torch.zeros(1).to(torch.float32)
+            x = torch.cat([x, torch.zeros_like(x).to(device)], dim=1) if x is not None else torch.zeros(1).to(device)
 
         # Main layers.
         for idx in range(self.num_layers):
