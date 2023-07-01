@@ -67,7 +67,7 @@ def is_image_ext(fname: Union[str, Path]) -> bool:
 #----------------------------------------------------------------------------
 import glob
 def open_image_zip(source, *, max_images: Optional[int] = None):
-    input_images = [str(f) for f in sorted(glob.glob(source + "*"))]
+    input_images = [str(f) for f in sorted(os.listdir(source)) if is_image_ext(f)]
     # Load labels.
     labels = {}
     if 'dataset.json' in os.listdir(source):
