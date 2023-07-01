@@ -64,7 +64,7 @@ class Dataset(torch.utils.data.Dataset):
         if self._raw_labels.shape[1] > 0:  # Check if the second dimension is not empty
             return self._raw_labels
         else:
-            return np.array([])
+            return np.array([0])
 
     def close(self): # to be overridden by subclass
         pass
