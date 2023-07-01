@@ -54,17 +54,17 @@ class Dataset(torch.utils.data.Dataset):
         if self._raw_labels is None:
             self._raw_labels = self._load_raw_labels() if self._use_labels else None
             if self._raw_labels is None:
-                self._raw_labels = np.zeros([self._raw_shape[0], 0], dtype=np.float32)
+                self._raw_labels = np.zeros([self._raw_shape[0]], dtype=np.float32)  # Changed to 1D array
             assert isinstance(self._raw_labels, np.ndarray)
             assert self._raw_labels.shape[0] == self._raw_shape[0]
             assert self._raw_labels.dtype in [np.float32, np.int64]
             if self._raw_labels.dtype == np.int64:
                 assert self._raw_labels.ndim == 1
                 assert np.all(self._raw_labels >= 0)
-        if self._raw_labels.shape[1] > 0:  # Check if the second dimension is not empty
+        if self._raw_labels.ndim == 1:  # Check if the dimension is 1
             return self._raw_labels
         else:
-            return np.array([0])
+            return np.array([0])  # Return a 1D array with a single element
 
     def close(self): # to be overridden by subclass
         pass
