@@ -107,7 +107,13 @@ class Dataset(torch.utils.data.Dataset):
         d = dnnlib.EasyDict()
         d.raw_idx = int(self._raw_idx[idx])
         d.xflip = (int(self._xflip[idx]) != 0)
-        d.raw_label = self._get_raw_labels()[d.raw_idx].copy()
+        raw_labels = self._get_raw_labels()
+        if idx < len(raw_labels):
+            label = raw_labels[self._raw_idx[idx]]
+        else:
+            print(f"Index {idx} out of bounds for array of size {len(raw_labels)}")
+            label = None  # or some other default value
+        d.raw_label = label
         return d
 
     @property
