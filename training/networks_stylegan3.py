@@ -152,7 +152,7 @@ class MappingNetwork(torch.nn.Module):
         #     y = self.embed(c.to(torch.float32))
         #     y = y * (y.square().mean(1, keepdim=True) + 1e-8).rsqrt()
         y = self.embed(c.to(torch.float32))
-        x = torch.cat([x, torch.zeros_like(x).to(device)], dim=1) if x is not None else torch.zeros_like(y).to(device)
+        x = torch.cat([x, torch.zeros_like(x).to(device)], dim=1) if x is not None else torch.zeros((y.shape[0], y.shape[0])).to(device)
 
         # Execute layers.
         for idx in range(self.num_layers):
