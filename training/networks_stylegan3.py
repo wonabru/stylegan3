@@ -93,6 +93,12 @@ class FullyConnectedLayer(torch.nn.Module):
             b = b.to(x.dtype)
             if self.bias_gain != 1:
                 b = b * self.bias_gain
+
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # Ensure the tensors are on the correct device
+        x = x.to(device)
+        w = w.to(device)
+        b = b.to(device)
         if self.activation == 'linear' and b is not None:
             x = torch.addmm(b.unsqueeze(0), x, w.t())
         else:
@@ -136,7 +142,8 @@ class MappingNetwork(torch.nn.Module):
         misc.assert_shape(z, [None, self.z_dim])
         if truncation_cutoff is None:
             truncation_cutoff = self.num_ws
-
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # Ensure the tensors are on the correct device
         # Embed, normalize, and concatenate inputs.
         x = z.to(torch.float32)
         x = x * (x.square().mean(1, keepdim=True) + 1e-8).rsqrt()
@@ -144,7 +151,7 @@ class MappingNetwork(torch.nn.Module):
         #     misc.assert_shape(c, [None, self.c_dim])
         #     y = self.embed(c.to(torch.float32))
         #     y = y * (y.square().mean(1, keepdim=True) + 1e-8).rsqrt()
-        x = torch.cat([x, torch.zeros_like(x).to(torch.float32)], dim=1) if x is not None else torch.zeros(1).to(torch.float32)
+        x = torch.cat([x, torch.zeros_like(x).to(device)], dim=1) if x is not None else torch.zeros(1).to(device)
 
         # Execute layers.
         for idx in range(self.num_layers):
