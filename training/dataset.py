@@ -120,7 +120,7 @@ class Dataset(torch.utils.data.Dataset):
             label = raw_labels[self._raw_idx[idx]]
         else:
             print(f"Index {idx} out of bounds for array of size {len(raw_labels)}")
-            label = np.array([0])  # or some other default value
+            label = None  # or some other default value
         d.raw_label = label
         return d
 
