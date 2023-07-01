@@ -66,7 +66,7 @@ def is_image_ext(fname: Union[str, Path]) -> bool:
 
 #----------------------------------------------------------------------------
 import glob
-def open_image_folder(source, *, max_images: Optional[int] = None):
+def open_image_zip(source, *, max_images: Optional[int] = None):
     input_images = [str(f) for f in sorted(glob.glob(source + "*"))]
     # Load labels.
     labels = {}
@@ -90,7 +90,7 @@ def open_image_folder(source, *, max_images: Optional[int] = None):
 
 #----------------------------------------------------------------------------
 
-def open_image_zip(source, *, max_images: Optional[int]):
+def open_image_zip2(source, *, max_images: Optional[int]):
     with zipfile.ZipFile(source, mode='r') as z:
         input_images = [str(f) for f in sorted(z.namelist()) if is_image_ext(f)]
 
