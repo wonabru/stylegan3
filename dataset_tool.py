@@ -66,28 +66,24 @@ def is_image_ext(fname: Union[str, Path]) -> bool:
 
 #----------------------------------------------------------------------------
 
-def open_image_folder(source_dir, *, max_images: Optional[int]):
-    input_images = [str(f) for f in sorted(Path(source_dir).rglob('*')) if is_image_ext(f) and os.path.isfile(f)]
-
+def open_image_folder(source, *, max_images: Optional[int] = None):
+    input_images = [str(f) for f in sorted(os.listdir(source)) if f.endswith('.jpg')]
     # Load labels.
     labels = {}
-    meta_fname = os.path.join(source_dir, 'dataset.json')
-    if os.path.isfile(meta_fname):
-        with open(meta_fname, 'r') as file:
+    if 'dataset.json' in os.listdir(source):
+        with open(os.path.join(source, 'dataset.json'), 'r') as file:
             labels = json.load(file)['labels']
             if labels is not None:
                 labels = { x[0]: x[1] for x in labels }
             else:
                 labels = {}
-
-    max_idx = maybe_min(len(input_images), max_images)
-
+    max_idx = min(len(input_images), max_images) if max_images else len(input_images)
     def iterate_images():
         for idx, fname in enumerate(input_images):
-            arch_fname = os.path.relpath(fname, source_dir)
-            arch_fname = arch_fname.replace('\\', '/')
-            img = np.array(PIL.Image.open(fname))
-            yield dict(img=img, label=labels.get(arch_fname))
+            with open(os.path.join(source, fname), 'r') as file:
+                img = PIL.Image.open(file) # type: ignore
+                img = np.array(img)
+            yield dict(img=img, label=labels.get(fname))
             if idx >= max_idx-1:
                 break
     return max_idx, iterate_images()
