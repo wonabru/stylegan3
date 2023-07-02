@@ -162,7 +162,7 @@ class Dataset(torch.utils.data.Dataset):
 
     @property
     def has_labels(self):
-        return any(x != 0 for x in self.label_shape)
+        return False  # any(x != 0 for x in self.label_shape)
 
     @property
     def has_onehot_labels(self):
