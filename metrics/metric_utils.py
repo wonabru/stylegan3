@@ -191,6 +191,27 @@ class ProgressMonitor:
             pfn_total       = self.pfn_total,
         )
 
+
+def collate_fn(batch):
+    data = [item[0] for item in batch]
+    data = torch.stack([torch.from_numpy(d) for d in data], dim=0)
+    targets = [item[1] for item in batch]
+    
+    # Check if targets have different shapes
+    if len(set([t.shape for t in targets])) != 1:
+        # Get the maximum shape
+        max_shape = tuple(max(s) for s in zip(*[t.shape for t in targets]))
+        # Create a new tensor with the maximum shape filled with zeros
+        targets_padded = torch.zeros((len(targets),) + max_shape)
+        # Copy the values from the original targets to the new tensor
+        for i, t in enumerate(targets):
+            targets_padded[i, :t.shape[0]] = torch.from_numpy(t) if isinstance(t, np.ndarray) else t
+        targets = targets_padded
+    else:
+        targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets])
+    
+    return [data, targets]
+
 #----------------------------------------------------------------------------
 
 def compute_feature_stats_for_dataset(opts, detector_url, detector_kwargs, rel_lo=0, rel_hi=1, batch_size=64, data_loader_kwargs=None, max_items=None, **stats_kwargs):
@@ -228,7 +249,7 @@ def compute_feature_stats_for_dataset(opts, detector_url, detector_kwargs, rel_l
 
     # Main loop.
     item_subset = [(i * opts.num_gpus + opts.rank) % num_items for i in range((num_items - 1) // opts.num_gpus + 1)]
-    for images, _labels in torch.utils.data.DataLoader(dataset=dataset, sampler=item_subset, batch_size=batch_size, **data_loader_kwargs):
+    for images, _labels in torch.utils.data.DataLoader(dataset=dataset, sampler=item_subset, batch_size=batch_size, collate_fn=collate_fn, **data_loader_kwargs):
         if images.shape[1] == 1:
             images = images.repeat([1, 3, 1, 1])
         features = detector(images.to(opts.device), **detector_kwargs)
