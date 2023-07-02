@@ -100,7 +100,7 @@ def collate_fn(batch):
         min_shape = min([t.shape for t in targets])
         # Reduce each tensor in targets to the minimum shape
         targets = [t.narrow(0, 0, min_shape[0]) for t in targets]
-    targets = torch.stack(targets)  # Stack the tensors
+    targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets])
     return [data, targets]
     
 #----------------------------------------------------------------------------
