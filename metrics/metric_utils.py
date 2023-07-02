@@ -205,7 +205,10 @@ def collate_fn(batch):
         targets_padded = torch.zeros((len(targets),) + max_shape)
         # Copy the values from the original targets to the new tensor
         for i, t in enumerate(targets):
-            targets_padded[i, :t.shape[0]] = torch.from_numpy(t) if isinstance(t, np.ndarray) else t
+            if len(targets_padded.shape) > 1 and len(t.shape) > 0:
+                targets_padded[i, :t.shape[0]] = torch.from_numpy(t) if isinstance(t, np.ndarray) else t
+            else:
+                print(f"Skipping index {i} due to incompatible shapes.")
         targets = targets_padded
     else:
         targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets])
