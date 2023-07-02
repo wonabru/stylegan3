@@ -151,8 +151,8 @@ class MappingNetwork(torch.nn.Module):
         #     misc.assert_shape(c, [None, self.c_dim])
         #     y = self.embed(c.to(torch.float32))
         #     y = y * (y.square().mean(1, keepdim=True) + 1e-8).rsqrt()
-        
-            x = torch.cat([x, torch.ones((512, 512)).to(device)], dim=1) if x is not None else torch.ones((512, 512)).to(device)
+            n = x.shape[1] if x is not None else 0
+            x = torch.cat([x, torch.ones((512, 512 - n)).to(device)], dim=1) if x is not None else torch.ones((512, 512)).to(device)
 
         # Execute layers.
         for idx in range(self.num_layers):
