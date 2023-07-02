@@ -94,13 +94,20 @@ def collate_fn(batch):
     data = [item[0] for item in batch]
     data = torch.stack([torch.from_numpy(d) for d in data], dim=0)
     targets = [item[1] for item in batch]
+    
     # Check if targets have different shapes
     if len(set([t.shape for t in targets])) != 1:
-        # Get the minimum shape
-        min_shape = min([t.shape for t in targets])
-        # Reduce each tensor in targets to the minimum shape
-        targets = [t.narrow(0, 0, min_shape[0]) for t in targets]
-    targets = [torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets]
+        # Get the maximum shape
+        max_shape = tuple(max(s) for s in zip(*[t.shape for t in targets]))
+        # Create a new tensor with the maximum shape filled with zeros
+        targets_padded = torch.zeros((len(targets),) + max_shape)
+        # Copy the values from the original targets to the new tensor
+        for i, t in enumerate(targets):
+            targets_padded[i, :t.shape[0]] = torch.from_numpy(t) if isinstance(t, np.ndarray) else t
+        targets = targets_padded
+    else:
+        targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets])
+    
     return [data, targets]
     
 #----------------------------------------------------------------------------
