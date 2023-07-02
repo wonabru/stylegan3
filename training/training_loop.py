@@ -106,7 +106,7 @@ def collate_fn(batch):
             targets_padded[i, :t.shape[0]] = torch.from_numpy(t) if isinstance(t, np.ndarray) else t
         targets = targets_padded
     else:
-        targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets])
+        targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else torch.tensor(t) for t in targets])
     
     return [data, targets]
     
