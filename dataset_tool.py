@@ -69,14 +69,14 @@ import glob
 def open_image_zip(source, *, max_images: Optional[int] = None):
     input_images = [str(f) for f in sorted(os.listdir(source)) if is_image_ext(f)]
     # Load labels.
-    labels = {}
-    if 'dataset.json' in os.listdir(source):
-        with open(os.path.join(source, 'dataset.json'), 'r') as file:
-            labels = json.load(file)['labels']
-            if labels is not None:
-                labels = { x[0]: x[1] for x in labels }
-            else:
-                labels = {}
+    # labels = {}
+    # if 'dataset.json' in os.listdir(source):
+    #     with open(os.path.join(source, 'dataset.json'), 'r') as file:
+    #         labels = json.load(file)['labels']
+    #         if labels is not None:
+    #             labels = { x[0]: x[1] for x in labels }
+    #         else:
+    #             labels = {}
     max_idx = min(len(input_images), max_images) if max_images else len(input_images)
     def iterate_images():
         for idx, fname in enumerate(input_images):
