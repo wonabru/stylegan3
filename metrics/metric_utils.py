@@ -211,7 +211,7 @@ def collate_fn(batch):
                 print(f"Skipping index {i} due to incompatible shapes.")
         targets = targets_padded
     else:
-        targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else t for t in targets])
+        targets = torch.stack([torch.from_numpy(t) if isinstance(t, np.ndarray) else torch.tensor(t) for t in targets])
     
     return [data, targets]
 
