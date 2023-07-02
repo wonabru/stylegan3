@@ -147,13 +147,13 @@ class MappingNetwork(torch.nn.Module):
         # Embed, normalize, and concatenate inputs.
         x = z.to(torch.float32)
         x = x * (x.square().mean(1, keepdim=True) + 1e-8).rsqrt()
-        # if self.c_dim > 0:
+        if self.c_dim > 0:
         #     misc.assert_shape(c, [None, self.c_dim])
         #     y = self.embed(c.to(torch.float32))
         #     y = y * (y.square().mean(1, keepdim=True) + 1e-8).rsqrt()
             # print(self.c_dim, x.shape)
             # n = x.shape[1] if x is not None else 0
-            # x = torch.cat([x, torch.ones((512, n)).to(device)], dim=1) if x is not None else torch.ones((512, 512)).to(device)
+            x = x.expand(512,512) if x is not None else torch.ones((512, 512)).to(device)
 
         # Execute layers.
         for idx in range(self.num_layers):
