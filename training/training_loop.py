@@ -90,12 +90,17 @@ def save_image_grid(img, fname, drange, grid_size):
     if C == 3:
         PIL.Image.fromarray(img, 'RGB').save(fname)
 
-
 def collate_fn(batch):
     data = [item[0] for item in batch]
     data = torch.stack([torch.from_numpy(d) for d in data], dim=0)
     targets = [item[1] for item in batch]
-    targets = torch.FloatTensor(targets)
+    # Check if targets have different shapes
+    if len(set([t.shape for t in targets])) != 1:
+        # Get the minimum shape
+        min_shape = min([t.shape for t in targets])
+        # Reduce each tensor in targets to the minimum shape
+        targets = [t.narrow(0, 0, min_shape[0]) for t in targets]
+    targets = torch.stack(targets)  # Stack the tensors
     return [data, targets]
     
 #----------------------------------------------------------------------------
