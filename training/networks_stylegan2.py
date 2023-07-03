@@ -247,8 +247,8 @@ class MappingNetwork(torch.nn.Module):
             #     y = normalize_2nd_moment(self.embed(c.to(torch.float32)))
             #     x = torch.cat([x, y], dim=1) if x is not None else y
                 # n = x.shape[1] if x is not None else 0
-                x = x.expand(512,-1) if x is not None else torch.ones((512, 512)).to(device)
-                x = x.expend(-1, 512).to(device)
+                x = x.expand(x.shape[0],-1) if x is not None else torch.ones((512, 512)).to(device)
+                x = x.expend(-1, x.shape[1]).to(device)
 
         # Main layers.
         for idx in range(self.num_layers):
